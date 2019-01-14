@@ -25,7 +25,7 @@ public class BoxResponse {
         this.kind = kind;
     }
 
-    public Long getTotalItems() {
+    public long getTotalItems() {
         return totalItems;
     }
 

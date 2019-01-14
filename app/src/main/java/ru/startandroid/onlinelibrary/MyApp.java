@@ -6,10 +6,6 @@ import ru.startandroid.onlinelibrary.di.AppComponent;
 import ru.startandroid.onlinelibrary.di.NetWorkModule;
 import ru.startandroid.onlinelibrary.di.DaggerAppComponent;
 
-/**
- * Created by Home on 30.04.2017.
- */
-
 public class MyApp extends Application {
     private static AppComponent appComponent;
     @Override

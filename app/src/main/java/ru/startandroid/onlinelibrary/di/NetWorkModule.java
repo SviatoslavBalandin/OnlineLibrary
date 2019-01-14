@@ -6,14 +6,11 @@ import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ru.startandroid.onlinelibrary.GoogleBooksApi;
 import ru.startandroid.onlinelibrary.WebAuthManager;
 
-/**
- * Created by user on 29/06/2017.
- */
 @Module
 public class NetWorkModule {
 
@@ -30,7 +27,7 @@ public class NetWorkModule {
     Retrofit provideRetrofit(OkHttpClient client){
 
         return  new Retrofit.Builder()
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .baseUrl("https://www.googleapis.com/")
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -38,7 +35,7 @@ public class NetWorkModule {
     }
     @Provides
     @Singleton
-    public GoogleBooksApi provideBooksApi(Retrofit retrofit){
+    GoogleBooksApi provideBooksApi(Retrofit retrofit){
         return retrofit.create(GoogleBooksApi.class);
     }
 }

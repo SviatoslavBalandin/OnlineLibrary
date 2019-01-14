@@ -13,11 +13,11 @@
 
         <SearchView
             android:id="@+id/barSearch"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:focusable="true"
             android:layout_weight="2"
-            ></SearchView>
+            android:focusable="true"
+            android:focusedByDefault="true" />
 
         <Button
             android:id="@+id/lookingButton"
@@ -25,8 +25,11 @@
             android:layout_height="wrap_content"
             android:background="@android:color/holo_blue_dark"
             android:clickable="true"
-            android:drawableBottom="@android:drawable/ic_menu_search"
-            />
+            android:text="search"
+            android:textSize="12sp"
+            android:textColor="@android:color/holo_green_light"
+            android:focusable="true"
+            android:paddingBottom="0dp" />
 
     </LinearLayout>
 
@@ -43,7 +46,7 @@
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:scrollbars="vertical"
             android:scrollbarThumbVertical="@color/cardview_dark_background"
-            ></android.support.v7.widget.RecyclerView>
+            />
 
 
     </LinearLayout>

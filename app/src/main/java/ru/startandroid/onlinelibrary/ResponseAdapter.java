@@ -1,6 +1,7 @@
 package ru.startandroid.onlinelibrary;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,19 +9,49 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ru.startandroid.onlinelibrary.model.BoxResponse;
-
-/**
- * Created by Home on 30.04.2017.
- */
+import ru.startandroid.onlinelibrary.model.Item;
 
 public class ResponseAdapter extends RecyclerView.Adapter<ResponseAdapter.ViewHolder> {
 
-    private BoxResponse response;
+    private BoxResponse firstResponse;
+    private boolean initiated = false;
+    private List<Item> items;
 
-    public ResponseAdapter(BoxResponse response){
-        this.response = response;
+    public void init(BoxResponse response) {
+        firstResponse = response;
+        items = response.getItems();
+        initiated = true;
     }
+    public boolean isInitiated(){
+        return initiated;
+    }
+
+    public void paginate(BoxResponse response) {
+        if(response.getItems() != null) {
+            Log.e("myLog", "response items = " + response.getItems().size());
+            items.addAll(response.getItems());
+            this.notifyDataSetChanged();
+
+        }
+    }
+    public long getTotalItemCount(){
+        long res = 0;
+        try{
+            res = firstResponse.getTotalItems();
+        }catch (NullPointerException e) {
+            e.fillInStackTrace();
+        }
+        return res;
+    }
+
+    /*private void notifyDataWasChanged(){
+        for (int i = 0; i < items.size(); i++) {
+            this.notifyItemChanged(i);
+        }
+    }*/
 
     @Override
     public ResponseAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -31,48 +62,46 @@ public class ResponseAdapter extends RecyclerView.Adapter<ResponseAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-        List<String> authors = response.getItems().get(position).getVolumeInfo().getAuthors();
-        String title = response.getItems().get(position).getVolumeInfo().getTitle();
-        String infoLink = response.getItems().get(position).getVolumeInfo().getInfoLink();
-        String publishedDate = response.getItems().get(position).getVolumeInfo().getPublishedDate();
+        if (initiated) {
+            List<String> authors = items.get(position).getVolumeInfo().getAuthors();
+            String title = items.get(position).getVolumeInfo().getTitle();
+            String infoLink = items.get(position).getVolumeInfo().getInfoLink();
+            String publishedDate = items.get(position).getVolumeInfo().getPublishedDate();
 
-        StringBuilder listOfAuthors = new StringBuilder();
-        if(authors != null) {
-            for (String author : authors) {
-                listOfAuthors.append(author);
-                if (authors.indexOf(author) != authors.size() - 1)
-                    listOfAuthors.append(", ");
+            StringBuilder listOfAuthors = new StringBuilder();
+            if (authors != null) {
+                for (String author : authors) {
+                    listOfAuthors.append(author);
+                    if (authors.indexOf(author) != authors.size() - 1)
+                        listOfAuthors.append(", ");
+                }
             }
-        }
-        if(listOfAuthors.length() != 0)
-            holder.authors.setText(listOfAuthors);
-        else
-            holder.authors.setText(publishedDate);
+            if (listOfAuthors.length() != 0)
+                holder.authors.setText(listOfAuthors);
+            else
+                holder.authors.setText(publishedDate);
 
-        holder.title.setText(title);
-        holder.infoLink.setText(infoLink);
+            holder.title.setText(title);
+            holder.infoLink.setText(infoLink);
+        }
     }
 
     @Override
     public int getItemCount() {
-        if(response.getItems() == null)
-            return 0;
-
-        return response.getItems().size();
+        return (items != null && initiated) ? items.size() : 0;
     }
-    class ViewHolder extends RecyclerView.ViewHolder{
 
+     class ViewHolder extends RecyclerView.ViewHolder{
+        @BindView(R.id.volume_title)
         TextView title;
+        @BindView(R.id.authors)
         TextView authors;
+        @BindView(R.id.infoLink)
         TextView infoLink;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
-
-            title = (TextView) itemView.findViewById(R.id.volume_title);
-            authors = (TextView) itemView.findViewById(R.id.authors);
-            infoLink = (TextView) itemView.findViewById(R.id.infoLink);
-
+            ButterKnife.bind(this, itemView);
         }
     }
 }

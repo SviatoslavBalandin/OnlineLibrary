@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">OnlineLibrary</string>
+    <string name="search">search</string>
+    <string name="req">Request...</string>
 </resources>
