@@ -13,12 +13,13 @@ public abstract class PaginationRecyclerListener extends RecyclerView.OnScrollLi
                 lastLoading();
                 Log.e("myLog", "last loading");
             }
-            else
+            else if(itsTimeToLoadMore())
                 loadMoreItems();
     }
     //abstract methods
     protected abstract void loadMoreItems();
     protected abstract void lastLoading();
+    protected abstract boolean itsTimeToLoadMore();
     public abstract boolean isLastPage();
 
 }

@@ -40,6 +40,7 @@ public class BooksSearchActivity extends Activity implements BooksSearchView{
     private ResponseAdapter adapter;
     private LinearLayoutManager manager;
     private final int ten = 10;
+    private String previousQuery = "";
 
     void resolveDependencies(){
         MyApp.getAppComponent().createBooksSearchComponent(new BooksSearchModule(this))
@@ -54,15 +55,19 @@ public class BooksSearchActivity extends Activity implements BooksSearchView{
         resolveDependencies();
         manager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(manager);
-        setPaginationListener(recyclerView);
         setOnKeyListener(searchView);
     }
     @OnClick(R.id.lookingButton)
     void onSearchClick() {
-        adapter = new ResponseAdapter();
         String query = searchView.getText().toString().trim();
-        presenter.searchBooks(query);
-        resetPageNumber();
+        Log.e("myLog", "previousQuery = " + previousQuery);
+        if(!query.equalsIgnoreCase(previousQuery)) {
+            previousQuery = query;
+            setPaginationListener(recyclerView);
+            adapter = new ResponseAdapter();
+            presenter.searchBooks(query);
+            resetPageNumber();
+        }
         hideKeyboard();
         Log.e("myLog", "page = " + page);
 
@@ -72,11 +77,11 @@ public class BooksSearchActivity extends Activity implements BooksSearchView{
     public void showBooksSearchResults(BoxResponse searchResult) {
         if(!adapter.isInitiated() && searchResult.getItems() != null)
             adapter.init(searchResult);
-        else if(adapter.isInitiated())
+        else if(adapter.isInitiated()) {
+            manager.scrollToPositionWithOffset(adapter.getItemCount() - 1, 0);
             adapter.paginate(searchResult);
-
+        }
         recyclerView.setAdapter(adapter);
-        manager.scrollToPositionWithOffset(manager.findLastVisibleItemPosition() - 1, 0);
     }
 
     @Override
@@ -87,6 +92,11 @@ public class BooksSearchActivity extends Activity implements BooksSearchView{
     @Override
     public void showInProgress() {
         Toast.makeText(this, "In process...", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showNothingFound() {
+        Toast.makeText(this, "Nothing found", Toast.LENGTH_SHORT).show();
     }
 
     private void hideKeyboard(){
@@ -133,15 +143,22 @@ public class BooksSearchActivity extends Activity implements BooksSearchView{
                 int amount = (int) (adapter.getTotalItemCount() - manager.getItemCount());
                 Log.e("myLog", "last amount = " + amount);
                 Log.e("myLog", " last PAGE = " + page);
+                Log.e("myLog", "total adapter item count = " + adapter.getTotalItemCount());
+                Log.e("myLog", "adapter item count = " + adapter.getItemCount());
                 presenter.lastRequest(searchView.getText().toString().trim(), page, amount);
-                //view.removeOnScrollListener(this);
-                Log.e("myLog", "vertical scroll view position = " + view.getVerticalScrollbarPosition());
+                view.removeOnScrollListener(this);
+            }
+
+            @Override
+            protected boolean itsTimeToLoadMore() {
+                return (manager.findLastVisibleItemPosition() == (adapter.getItemCount() - 3));
             }
 
             @Override
             public boolean isLastPage() {
                 return adapter.getTotalItemCount() - manager.getItemCount() <= ten;
             }
+
 
         });
     }

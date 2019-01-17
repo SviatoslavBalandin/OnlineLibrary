@@ -31,9 +31,8 @@ public class ResponseAdapter extends RecyclerView.Adapter<ResponseAdapter.ViewHo
 
     public void paginate(BoxResponse response) {
         if(response.getItems() != null) {
-            Log.e("myLog", "response items = " + response.getItems().size());
             items.addAll(response.getItems());
-            this.notifyDataSetChanged();
+            //this.notifyDataSetChanged();
 
         }
     }
@@ -46,12 +45,6 @@ public class ResponseAdapter extends RecyclerView.Adapter<ResponseAdapter.ViewHo
         }
         return res;
     }
-
-    /*private void notifyDataWasChanged(){
-        for (int i = 0; i < items.size(); i++) {
-            this.notifyItemChanged(i);
-        }
-    }*/
 
     @Override
     public ResponseAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

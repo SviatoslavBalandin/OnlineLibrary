@@ -13,4 +13,6 @@ public interface BooksSearchView {
     void showBooksSearchError(String error);
 
     void showInProgress();
+
+    void showNothingFound();
 }
