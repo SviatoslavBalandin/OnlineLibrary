@@ -39,7 +39,7 @@ public class BooksSearchActivity extends Activity implements BooksSearchView{
 
     private ResponseAdapter adapter;
     private LinearLayoutManager manager;
-    private final int ten = 10;
+    private final int TEN = 10;
     private String previousQuery = "";
 
     void resolveDependencies(){
@@ -119,13 +119,13 @@ public class BooksSearchActivity extends Activity implements BooksSearchView{
             return false;
         });
     }
-    private int page = ten;
+    private int page = TEN;
 
     private void resetPageNumber(){
-        page = ten;
+        page = TEN;
     }
 
-    private void setPaginationListener(RecyclerView view) {
+    private void    setPaginationListener(RecyclerView view) {
         view.addOnScrollListener(new PaginationRecyclerListener() {
 
 
@@ -134,7 +134,7 @@ public class BooksSearchActivity extends Activity implements BooksSearchView{
                 Log.e("myLog", "total adapter item count = " + adapter.getTotalItemCount());
                 Log.e("myLog", "adapter item count = " + adapter.getItemCount());
                 presenter.paginateBooks(searchView.getText().toString().trim(), page);
-                page += ten;
+                page += TEN;
                 Log.e("myLog", "PAGE = " + page);
             }
 
@@ -143,10 +143,10 @@ public class BooksSearchActivity extends Activity implements BooksSearchView{
                 int amount = (int) (adapter.getTotalItemCount() - manager.getItemCount());
                 Log.e("myLog", "last amount = " + amount);
                 Log.e("myLog", " last PAGE = " + page);
-                Log.e("myLog", "total adapter item count = " + adapter.getTotalItemCount());
-                Log.e("myLog", "adapter item count = " + adapter.getItemCount());
+                Log.e("myLog", "total adapter item count2 = " + adapter.getTotalItemCount());
+                Log.e("myLog", "adapter item count2 = " + adapter.getItemCount());
                 presenter.lastRequest(searchView.getText().toString().trim(), page, amount);
-                view.removeOnScrollListener(this);
+                //view.removeOnScrollListener(this);
             }
 
             @Override
@@ -156,7 +156,7 @@ public class BooksSearchActivity extends Activity implements BooksSearchView{
 
             @Override
             public boolean isLastPage() {
-                return adapter.getTotalItemCount() - manager.getItemCount() <= ten;
+                return adapter.getTotalItemCount() - manager.getItemCount() <= TEN;
             }
 
 

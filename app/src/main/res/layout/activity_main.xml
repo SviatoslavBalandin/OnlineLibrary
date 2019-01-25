@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:background="@android:color/holo_blue_dark"
             android:clickable="true"
-            android:text="search"
+            android:text="@string/search"
             android:textSize="12sp"
             android:textColor="@android:color/holo_green_light"
             android:focusable="true"
@@ -33,21 +33,29 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
+        >
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:id="@+id/recyclerView"
-            android:verticalScrollbarPosition="right"
-            android:scrollbarAlwaysDrawVerticalTrack="true"
-            android:scrollbars="vertical"
-            android:scrollbarThumbVertical="@color/cardview_dark_background"
-            />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
+            <android.support.v7.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/recyclerView"
+                android:verticalScrollbarPosition="right"
+                android:scrollbarAlwaysDrawVerticalTrack="true"
+                android:scrollbars="vertical"
+                android:scrollbarThumbVertical="@color/cardview_dark_background"
+                />
 
-    </LinearLayout>
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+    </android.support.constraint.ConstraintLayout>
 </LinearLayout>

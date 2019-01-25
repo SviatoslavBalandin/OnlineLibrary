@@ -35,12 +35,12 @@ public class BooksSearchPresenterImpl implements BooksSearchPresenter{
                     .onErrorReturnItem(stub)
                     .subscribe(
                             boxResponse -> {
-                        if(boxResponse.getTotalItems() == 0)
-                            view.showNothingFound();
-                        else
-                            view.showBooksSearchResults(boxResponse);},
+                                if(boxResponse.getTotalItems() == 0)
+                                    view.showNothingFound();
+
+                                    view.showBooksSearchResults(boxResponse);},
                             error -> {
-                        view.showBooksSearchError("An error occur during networking");
+                                    view.showBooksSearchError("An error occur during networking");
                         Log.e("myLog", error.getMessage(), error);
                     });
 

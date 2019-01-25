@@ -5,16 +5,17 @@ import android.util.Log;
 
 public abstract class PaginationRecyclerListener extends RecyclerView.OnScrollListener {
 
+
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);
-
-            if(isLastPage()) {
+        if(dy > 0) {
+            if (isLastPage()) {
                 lastLoading();
                 Log.e("myLog", "last loading");
-            }
-            else if(itsTimeToLoadMore())
+            } else if (itsTimeToLoadMore())
                 loadMoreItems();
+        }
     }
     //abstract methods
     protected abstract void loadMoreItems();
