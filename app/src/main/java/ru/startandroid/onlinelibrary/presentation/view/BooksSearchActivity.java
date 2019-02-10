@@ -3,6 +3,7 @@ package ru.startandroid.onlinelibrary.presentation.view;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,68 +21,57 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ru.startandroid.onlinelibrary.MyApp;
 import ru.startandroid.onlinelibrary.R;
-import ru.startandroid.onlinelibrary.ResponseAdapter;
 import ru.startandroid.onlinelibrary.di.BooksSearchModule;
-import ru.startandroid.onlinelibrary.model.BoxResponse;
+import ru.startandroid.onlinelibrary.model.POJOs.BoxResponse;
+import ru.startandroid.onlinelibrary.presentation.view.search_view_services.ResponseAdapter;
 import ru.startandroid.onlinelibrary.presentation.presenter.BooksSearchPresenter;
-import ru.startandroid.onlinelibrary.presentation.view.view_servises.PaginationRecyclerListener;
+import ru.startandroid.onlinelibrary.presentation.view.search_view_services.SearchDiffUtilCallback;
 
-public class BooksSearchActivity extends Activity implements BooksSearchView{
+public class BooksSearchActivity extends Activity implements BooksSearchView, SwipeRefreshLayout.OnRefreshListener{
 
+    @BindView(R.id.swipeListLayout)
+    SwipeRefreshLayout swipeLayout;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.lookingButton)
     Button btnSearch;
     @BindView(R.id.barSearch)
     EditText searchView;
+
     @Inject
     BooksSearchPresenter presenter;
 
     private ResponseAdapter adapter;
-    private LinearLayoutManager manager;
-    private final int TEN = 10;
-    private String previousQuery = "";
 
     void resolveDependencies(){
         MyApp.getAppComponent().createBooksSearchComponent(new BooksSearchModule(this))
                 .inject(this);
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_fragment_layout);
         ButterKnife.bind(this);
+        swipeLayout.setOnRefreshListener(this);
         resolveDependencies();
-        manager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(manager);
+        adapter = new ResponseAdapter(new SearchDiffUtilCallback());
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         setOnKeyListener(searchView);
     }
+
     @OnClick(R.id.lookingButton)
     void onSearchClick() {
         String query = searchView.getText().toString().trim();
-        Log.e("myLog", "previousQuery = " + previousQuery);
-        if(!query.equalsIgnoreCase(previousQuery)) {
-            previousQuery = query;
-            setPaginationListener(recyclerView);
-            adapter = new ResponseAdapter();
-            presenter.searchBooks(query);
-            resetPageNumber();
+        if(!query.isEmpty()) {
+            adapter.submitList(presenter.request(query));
+            recyclerView.setAdapter(adapter);
+            hideKeyboard();
         }
-        hideKeyboard();
-        Log.e("myLog", "page = " + page);
-
     }
 
     @Override
-    public void showBooksSearchResults(BoxResponse searchResult) {
-        if(!adapter.isInitiated() && searchResult.getItems() != null)
-            adapter.init(searchResult);
-        else if(adapter.isInitiated()) {
-            manager.scrollToPositionWithOffset(adapter.getItemCount() - 1, 0);
-            adapter.paginate(searchResult);
-        }
-        recyclerView.setAdapter(adapter);
+    public int getMainListSize() {
+        return adapter.getCurrentList().size();
     }
 
     @Override
@@ -119,48 +109,11 @@ public class BooksSearchActivity extends Activity implements BooksSearchView{
             return false;
         });
     }
-    private int page = TEN;
 
-    private void resetPageNumber(){
-        page = TEN;
-    }
-
-    private void    setPaginationListener(RecyclerView view) {
-        view.addOnScrollListener(new PaginationRecyclerListener() {
-
-
-            @Override
-            protected void loadMoreItems() {
-                Log.e("myLog", "total adapter item count = " + adapter.getTotalItemCount());
-                Log.e("myLog", "adapter item count = " + adapter.getItemCount());
-                presenter.paginateBooks(searchView.getText().toString().trim(), page);
-                page += TEN;
-                Log.e("myLog", "PAGE = " + page);
-            }
-
-            @Override
-            protected void lastLoading() {
-                int amount = (int) (adapter.getTotalItemCount() - manager.getItemCount());
-                Log.e("myLog", "last amount = " + amount);
-                Log.e("myLog", " last PAGE = " + page);
-                Log.e("myLog", "total adapter item count2 = " + adapter.getTotalItemCount());
-                Log.e("myLog", "adapter item count2 = " + adapter.getItemCount());
-                presenter.lastRequest(searchView.getText().toString().trim(), page, amount);
-                //view.removeOnScrollListener(this);
-            }
-
-            @Override
-            protected boolean itsTimeToLoadMore() {
-                return (manager.findLastVisibleItemPosition() == (adapter.getItemCount() - 3));
-            }
-
-            @Override
-            public boolean isLastPage() {
-                return adapter.getTotalItemCount() - manager.getItemCount() <= TEN;
-            }
-
-
-        });
+    @Override
+    public void onRefresh() {
+        btnSearch.performClick();
+        swipeLayout.setRefreshing(false);
     }
 }
 

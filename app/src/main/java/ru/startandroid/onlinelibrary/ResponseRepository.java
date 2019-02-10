@@ -2,7 +2,7 @@ package ru.startandroid.onlinelibrary;
 
 import java.util.List;
 
-import ru.startandroid.onlinelibrary.model.Item;
+import ru.startandroid.onlinelibrary.model.POJOs.Item;
 
 public interface ResponseRepository {
 

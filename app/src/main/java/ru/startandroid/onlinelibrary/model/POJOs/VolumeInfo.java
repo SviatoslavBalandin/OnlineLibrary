@@ -1,5 +1,5 @@
 
-package ru.startandroid.onlinelibrary.model;
+package ru.startandroid.onlinelibrary.model.POJOs;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;

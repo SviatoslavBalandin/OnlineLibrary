@@ -1,10 +1,10 @@
-package ru.startandroid.onlinelibrary;
+package ru.startandroid.onlinelibrary.model.service;
 
 
 import io.reactivex.Flowable;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import ru.startandroid.onlinelibrary.model.BoxResponse;
+import ru.startandroid.onlinelibrary.model.POJOs.BoxResponse;
 
 public interface GoogleBooksApi {
     @GET("/books/v1/volumes")

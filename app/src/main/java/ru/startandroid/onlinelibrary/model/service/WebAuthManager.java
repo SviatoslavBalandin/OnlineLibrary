@@ -1,4 +1,4 @@
-package ru.startandroid.onlinelibrary;
+package ru.startandroid.onlinelibrary.model.service;
 
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;

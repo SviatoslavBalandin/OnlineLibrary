@@ -22,6 +22,5 @@ public class MyApp extends Application {
                 .netWorkModule(new NetWorkModule())
                 .build();
     }
-
 }
 //"https://www.googleapis.com/"

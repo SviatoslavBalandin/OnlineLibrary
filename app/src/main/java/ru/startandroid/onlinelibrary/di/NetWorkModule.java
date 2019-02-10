@@ -8,8 +8,8 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import ru.startandroid.onlinelibrary.GoogleBooksApi;
-import ru.startandroid.onlinelibrary.WebAuthManager;
+import ru.startandroid.onlinelibrary.model.service.GoogleBooksApi;
+import ru.startandroid.onlinelibrary.model.service.WebAuthManager;
 
 @Module
 public class NetWorkModule {

@@ -1,10 +1,10 @@
 
-package ru.startandroid.onlinelibrary.model;
+package ru.startandroid.onlinelibrary.model.POJOs;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class ListPrice_ {
+public class RetailPrice_ {
 
     @SerializedName("amountInMicros")
     @Expose
