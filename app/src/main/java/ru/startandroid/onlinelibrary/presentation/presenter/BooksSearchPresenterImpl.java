@@ -68,8 +68,8 @@ public class BooksSearchPresenterImpl implements BooksSearchPresenter{
         @Override
         public void loadInitial(@NonNull LoadInitialParams params, @NonNull LoadInitialCallback<Item> callback) {
 
-
             view.showInProgress();
+
             booksApi.getData(searchQuery)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -82,15 +82,12 @@ public class BooksSearchPresenterImpl implements BooksSearchPresenter{
                                 }
                                 else
                                     callback.onResult(boxResponse.getItems(), startPage);},
-                            error -> {
-                                view.showBooksSearchError("An error occur during networking");
-                            });
+                            error -> view.showBooksSearchError("An error occur during networking"));
 
         }
         @SuppressLint("CheckResult")
         @Override
         public void loadRange(@NonNull LoadRangeParams params, @NonNull LoadRangeCallback<Item> callback) {
-
 
             startPage += PAGE_SIZE;
 
@@ -101,17 +98,18 @@ public class BooksSearchPresenterImpl implements BooksSearchPresenter{
                     .subscribe(
                             boxResponse -> {
                                 long itemsCount = boxResponse.getTotalItems();
+
                                 if(itemsCount != 0 && itemsCount > view.getMainListSize()) {
                                     callback.onResult(boxResponse.getItems());
                                 }
                                 else
                                     callback.onResult(stub.getItems());
                                 },
-                            error -> {
-                                view.showBooksSearchError("An error occur during networking");
-                            });
+                            error ->
+                                    view.showBooksSearchError("An error occur during networking"));
         }
     }
+
     private class MainThreadExecutor implements Executor {
         private final Handler h = new Handler(Looper.getMainLooper());
 

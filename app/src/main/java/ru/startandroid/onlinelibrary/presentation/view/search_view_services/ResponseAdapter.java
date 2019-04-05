@@ -25,14 +25,38 @@ public class ResponseAdapter extends PagedListAdapter<Item, ResponseAdapter.View
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder (ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder (@NonNull ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.response_item, parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull ResponseAdapter.ViewHolder holder, int position) {
-       holder.bindItem(getItem(position), position);
+        Item item = getItem(position);
+        if (item != null &&item.getVolumeInfo() != null) {
+            List<String> authors = item.getVolumeInfo().getAuthors();
+            String title = item.getVolumeInfo().getTitle();
+            String infoLink = item.getVolumeInfo().getInfoLink();
+            String publishedDate = item.getVolumeInfo().getPublishedDate();
+
+            StringBuilder listOfAuthors = new StringBuilder();
+            if (authors != null) {
+                for (String author : authors) {
+                    listOfAuthors.append(author);
+                    if (authors.indexOf(author) != authors.size() - 1)
+                        listOfAuthors.append(", ");
+                }
+            }
+            if (listOfAuthors.length() != 0)
+                holder.authorsView.setText(listOfAuthors);
+            else
+                holder.authorsView.setText(publishedDate);
+
+            holder.titleView.setText(title);
+            holder.infoLinkView.setText(infoLink);
+            holder.countNumber.setText(String.valueOf(position + 1));
+        }
     }
+
 
     class ViewHolder extends RecyclerView.ViewHolder{
         @BindView(R.id.volume_title)
@@ -47,32 +71,6 @@ public class ResponseAdapter extends PagedListAdapter<Item, ResponseAdapter.View
         ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-        }
-
-        void bindItem(Item item, int position){
-            if (item.getVolumeInfo() != null) {
-                List<String> authors = item.getVolumeInfo().getAuthors();
-                String title = item.getVolumeInfo().getTitle();
-                String infoLink = item.getVolumeInfo().getInfoLink();
-                String publishedDate = item.getVolumeInfo().getPublishedDate();
-
-                StringBuilder listOfAuthors = new StringBuilder();
-                if (authors != null) {
-                    for (String author : authors) {
-                        listOfAuthors.append(author);
-                        if (authors.indexOf(author) != authors.size() - 1)
-                            listOfAuthors.append(", ");
-                    }
-                }
-                if (listOfAuthors.length() != 0)
-                    authorsView.setText(listOfAuthors);
-                else
-                    authorsView.setText(publishedDate);
-
-                titleView.setText(title);
-                infoLinkView.setText(infoLink);
-                countNumber.setText(String.valueOf(position + 1));
-            }
         }
     }
 }

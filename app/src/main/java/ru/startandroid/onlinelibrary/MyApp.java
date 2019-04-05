@@ -23,4 +23,3 @@ public class MyApp extends Application {
                 .build();
     }
 }
-//"https://www.googleapis.com/"

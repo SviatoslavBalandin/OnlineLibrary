@@ -16,7 +16,6 @@ public class BooksSearchModule {
         this.view = view;
     }
 
-    @PerScreen
     @Provides
     BooksSearchPresenter providesBooksSearchPresenter(GoogleBooksApi api){
         return new BooksSearchPresenterImpl(api, view);

@@ -1,12 +1,13 @@
 package ru.startandroid.onlinelibrary.presentation.view;
 
-import android.app.Activity;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -22,12 +23,12 @@ import butterknife.OnClick;
 import ru.startandroid.onlinelibrary.MyApp;
 import ru.startandroid.onlinelibrary.R;
 import ru.startandroid.onlinelibrary.di.BooksSearchModule;
-import ru.startandroid.onlinelibrary.model.POJOs.BoxResponse;
-import ru.startandroid.onlinelibrary.presentation.view.search_view_services.ResponseAdapter;
 import ru.startandroid.onlinelibrary.presentation.presenter.BooksSearchPresenter;
+import ru.startandroid.onlinelibrary.presentation.view.search_view_services.ResponseAdapter;
 import ru.startandroid.onlinelibrary.presentation.view.search_view_services.SearchDiffUtilCallback;
+import ru.startandroid.onlinelibrary.presentation.view.search_view_services.SearchViewModel;
 
-public class BooksSearchActivity extends Activity implements BooksSearchView, SwipeRefreshLayout.OnRefreshListener{
+public class BooksSearchActivity extends AppCompatActivity implements BooksSearchView, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.swipeListLayout)
     SwipeRefreshLayout swipeLayout;
@@ -42,28 +43,47 @@ public class BooksSearchActivity extends Activity implements BooksSearchView, Sw
     BooksSearchPresenter presenter;
 
     private ResponseAdapter adapter;
+    private static final String QUERY_KEY = "q11846";
+    private static final String KEY_RECYCLER_STATE = "recycler_state_0.1";
+    private String query;
+    private static Bundle recyclerViewState;
+    private SearchViewModel model;
 
-    void resolveDependencies(){
+    void resolveDependencies() {
         MyApp.getAppComponent().createBooksSearchComponent(new BooksSearchModule(this))
                 .inject(this);
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_fragment_layout);
         ButterKnife.bind(this);
+        if (savedInstanceState != null) query = (String) savedInstanceState.get(QUERY_KEY);
         swipeLayout.setOnRefreshListener(this);
         resolveDependencies();
-        adapter = new ResponseAdapter(new SearchDiffUtilCallback());
+        model = ViewModelProviders.of(this).get(SearchViewModel.class);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new ResponseAdapter(new SearchDiffUtilCallback());
+        if (model.listWasSet()) {
+            adapter.submitList(model.getSavedList());
+            recyclerView.setAdapter(adapter);
+        }
         setOnKeyListener(searchView);
+
     }
 
     @OnClick(R.id.lookingButton)
     void onSearchClick() {
-        String query = searchView.getText().toString().trim();
-        if(!query.isEmpty()) {
-            adapter.submitList(presenter.request(query));
+
+        if (query == null) query = searchView.getText().toString().trim();
+
+        if (!query.isEmpty()) {
+            Bundle pair = new Bundle();
+            pair.putString(QUERY_KEY, query);
+            this.onSaveInstanceState(pair);
+            model.setList(presenter.request(query));
+            adapter.submitList(model.getSavedList());
             recyclerView.setAdapter(adapter);
             hideKeyboard();
         }
@@ -71,7 +91,7 @@ public class BooksSearchActivity extends Activity implements BooksSearchView, Sw
 
     @Override
     public int getMainListSize() {
-        return adapter.getCurrentList().size();
+        return (adapter != null && adapter.getCurrentList() != null) ? adapter.getCurrentList().size() : 0;
     }
 
     @Override
@@ -89,21 +109,20 @@ public class BooksSearchActivity extends Activity implements BooksSearchView, Sw
         Toast.makeText(this, "Nothing found", Toast.LENGTH_SHORT).show();
     }
 
-    private void hideKeyboard(){
+    private void hideKeyboard() {
         View v = this.getCurrentFocus();
         if (v != null) {
             InputMethodManager inMan = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            try {
+            if (inMan != null) {
                 inMan.hideSoftInputFromWindow(v.getWindowToken(), 0);
-            }catch (NullPointerException e) {
-                e.fillInStackTrace();
             }
         }
     }
+
     private void setOnKeyListener(EditText searchView) {
         searchView.setOnKeyListener((v, keyCode, event) -> {
-            if(event.getAction() == KeyEvent.ACTION_DOWN){
-                if(keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER)
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER)
                     btnSearch.performClick();
             }
             return false;
@@ -114,6 +133,24 @@ public class BooksSearchActivity extends Activity implements BooksSearchView, Sw
     public void onRefresh() {
         btnSearch.performClick();
         swipeLayout.setRefreshing(false);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        recyclerViewState = new Bundle();
+        Parcelable listState = recyclerView.getLayoutManager().onSaveInstanceState();
+        recyclerViewState.putParcelable(KEY_RECYCLER_STATE, listState);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (recyclerViewState != null) {
+            Parcelable listState = recyclerViewState.getParcelable(KEY_RECYCLER_STATE);
+            recyclerView.getLayoutManager().onRestoreInstanceState(listState);
+        }
     }
 }
 
