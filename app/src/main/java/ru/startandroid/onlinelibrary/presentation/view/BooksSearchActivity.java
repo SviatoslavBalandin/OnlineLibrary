@@ -4,7 +4,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,10 +27,8 @@ import ru.startandroid.onlinelibrary.presentation.view.search_view_services.Resp
 import ru.startandroid.onlinelibrary.presentation.view.search_view_services.SearchDiffUtilCallback;
 import ru.startandroid.onlinelibrary.presentation.view.search_view_services.SearchViewModel;
 
-public class BooksSearchActivity extends AppCompatActivity implements BooksSearchView, SwipeRefreshLayout.OnRefreshListener {
+public class BooksSearchActivity extends AppCompatActivity implements BooksSearchView {
 
-    @BindView(R.id.swipeListLayout)
-    SwipeRefreshLayout swipeLayout;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.lookingButton)
@@ -44,7 +41,7 @@ public class BooksSearchActivity extends AppCompatActivity implements BooksSearc
 
     private ResponseAdapter adapter;
     private static final String QUERY_KEY = "q11846";
-    private static final String KEY_RECYCLER_STATE = "recycler_state_0.1";
+    private static final String KEY_RECYCLER_STATE = "recycler_state_1";
     private String query;
     private static Bundle recyclerViewState;
     private SearchViewModel model;
@@ -60,7 +57,6 @@ public class BooksSearchActivity extends AppCompatActivity implements BooksSearc
         setContentView(R.layout.search_fragment_layout);
         ButterKnife.bind(this);
         if (savedInstanceState != null) query = (String) savedInstanceState.get(QUERY_KEY);
-        swipeLayout.setOnRefreshListener(this);
         resolveDependencies();
         model = ViewModelProviders.of(this).get(SearchViewModel.class);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -70,13 +66,11 @@ public class BooksSearchActivity extends AppCompatActivity implements BooksSearc
             recyclerView.setAdapter(adapter);
         }
         setOnKeyListener(searchView);
-
     }
 
     @OnClick(R.id.lookingButton)
     void onSearchClick() {
-
-        if (query == null) query = searchView.getText().toString().trim();
+        query = searchView.getText().toString().trim();
 
         if (!query.isEmpty()) {
             Bundle pair = new Bundle();
@@ -130,12 +124,6 @@ public class BooksSearchActivity extends AppCompatActivity implements BooksSearc
     }
 
     @Override
-    public void onRefresh() {
-        btnSearch.performClick();
-        swipeLayout.setRefreshing(false);
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
         recyclerViewState = new Bundle();
@@ -146,7 +134,6 @@ public class BooksSearchActivity extends AppCompatActivity implements BooksSearc
     @Override
     protected void onResume() {
         super.onResume();
-
         if (recyclerViewState != null) {
             Parcelable listState = recyclerViewState.getParcelable(KEY_RECYCLER_STATE);
             recyclerView.getLayoutManager().onRestoreInstanceState(listState);

@@ -11,14 +11,12 @@ import android.support.annotation.NonNull;
 import java.util.Collections;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import ru.startandroid.onlinelibrary.model.POJOs.BoxResponse;
 import ru.startandroid.onlinelibrary.model.POJOs.Item;
 import ru.startandroid.onlinelibrary.model.service.GoogleBooksApi;
 import ru.startandroid.onlinelibrary.presentation.view.BooksSearchView;
-
 
 public class BooksSearchPresenterImpl implements BooksSearchPresenter{
 
@@ -112,7 +110,6 @@ public class BooksSearchPresenterImpl implements BooksSearchPresenter{
 
     private class MainThreadExecutor implements Executor {
         private final Handler h = new Handler(Looper.getMainLooper());
-
         @Override
         public void execute(@NonNull Runnable command) {
             h.post(command);
